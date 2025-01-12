@@ -3,7 +3,7 @@ from tg_response_operations import get_msg_address
 
 class coordinate_storage:
     storage = {}
-    storage_name = "storage_file"
+    storage_name = "../storage_file"
     flush_cnt = 0
 
     @classmethod

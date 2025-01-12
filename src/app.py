@@ -23,9 +23,7 @@ channel_ids = {
     -1002492992460: "БЕРЕГ СОЧИ. ЧС. Помощь птицам. Сочинское географическое общество"
 }    
 
-
-#https://t.me/sochi_bereg/4/9414
-# vs https://t.me/c/2492992460/9412/9414            
+       
 
 with open("../__token_for_telegram_user.txt", "r") as f:
     api_id = f.readline()[:-1]
