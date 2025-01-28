@@ -1,15 +1,32 @@
 import pandas as pd
 import re
+import json
 
 def get_msg_chat_id(msg):
     return msg["chat"]["id"]
 
+#https://t.me/MoreOz/84594
+#https://t.me/c/1438763209/84594
+
+#https://t.me/c/2370426098/4935/4953 - invalid
+#https://t.me/c/2370426098/4952/4953 - valid
+#https://t.me/delfin_volna/1/4935
+
+
 def get_msg_address(msg):
-    address = f'https://t.me/c/{str(msg["chat"]["id"])[4:]}/{msg["reply_to_message_id"]}/{msg["id"]}'
-    return address
+#    try:
+        if "reply_to_message_id" in msg or "reply_to_top_message_id" in msg:
+            msg_topic_id = msg['reply_to_message_id'] if 'reply_to_top_message_id' not in msg else msg['reply_to_top_message_id']
+            address = f'https://t.me/c/{str(msg["chat"]["id"])[4:]}/{msg_topic_id}/{msg["id"]}'
+        else:
+            address = f'https://t.me/c/{str(msg["chat"]["id"])[4:]}/{msg["id"]}'
+#    except:
+        #print(json.dumps(msg, indent = 4))
+#        return None
+        return address
 
 def validate_message_type(msg):
-    if msg.get('_') == 'Message' and "reply_to_message_id" in msg:
+    if msg.get('_') == 'Message':
         return True
     return False
 
@@ -17,13 +34,22 @@ def get_message_date(msg):
     return msg.get("date", "")
 
 def get_message_text(msg):
-    full_text = f'{msg.get("text", "")}\n{msg.get("caption", "")}'
-    return full_text
+    text = ""
+    if msg.text is not None:
+        text = msg.text
+    if msg.caption is not None:
+        text = text + msg.caption
+    return text
 
-def get_chat_topic(msg):
-    msg['topic_id'] = msg['reply_to_message_id'] if 'reply_to_top_message_id' not in msg else msg['reply_to_top_message_id']
+def get_chat_topic(message):
+    msg = json.loads(str(message))
+    if "reply_to_message_id" in msg or "reply_to_top_message_id" in msg:
+        msg['topic_id'] = msg['reply_to_message_id'] if 'reply_to_top_message_id' not in msg else msg['reply_to_top_message_id']
+    else: 
+        return "Не известно..."
+
     
-    topics_file_path = 'chats_topics.csv'
+    topics_file_path = '../chats_topics.csv'
     topics_df = pd.read_csv(topics_file_path)
     # Фильтрация по chat_id = -1002415079849
     topics_filtered = topics_df[topics_df['chat_id'] == get_msg_chat_id(msg)]

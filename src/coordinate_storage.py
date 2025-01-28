@@ -12,8 +12,9 @@ class coordinate_storage:
             cls.storage = json.load(f)
 
     @classmethod
-    def storage_append(cls, message_json):
-        link = get_msg_address(message_json)
+    def storage_append(cls, message):
+        #link = message.link
+        link = f"{message.chat.id}/{message.id}"
         if link in cls.storage:
             return False
         cls.storage[link] = "+"
